@@ -1,0 +1,68 @@
+{
+	auto_https off
+
+	order request_id before header
+}
+
+:2020 {
+	# Fetch the request-id and set it as the x-correlation-id header
+	# the header is defined by the API-guidelines of Digitaal Vlaanderen.
+	@hasNoCorr {
+		expression {header.X-Correlation-Id} == ""
+	}
+	@hasCorr {
+		expression {header.X-Correlation-Id} != ""
+	}
+
+	request_id
+	header @hasCorr ?X-Correlation-Id {header.X-Correlation-Id}
+	header @hasNoCorr ?X-Correlation-Id {http.request_id}
+
+	# Make the logs docker friendly and inject the request-id
+	log {
+		output stdout
+		format transform `{request>remote_addr} - {request>user_id} [{ts}] "{request>method} {request>uri} {request>proto}" {status} {size} "{request>headers>X-Correlation-Id>[0]}" "{request>headers>Referer>[0]}" "{request>headers>User-Agent>[0]}"` {
+			time_format "02/Jan/2006:15:04:05 -0700"
+		}
+	}
+
+	#
+	handle_errors {
+		respond "{http.error.status_code} {http.error.status_text}"
+	}
+
+	route /version* {
+		respond * "{$VERSION}" 200
+	}
+}
+
+:80 {
+	# Fetch the request-id or get a new one
+	@hasNoCorr {
+		expression {header.X-Correlation-Id} == ""
+	}
+	@hasCorr {
+		expression {header.X-Correlation-Id} != ""
+	}
+
+	request_id 21
+	header @hasCorr ?X-Correlation-Id {header.X-Correlation-Id}
+	header @hasNoCorr ?X-Correlation-Id {http.request_id}
+
+	# Make the logs docker friendly and inject the request-id
+	log {
+		output stdout
+		format transform `{http.request_id} {request>remote_addr} - {request>user_id} [{ts}] "{request>method} {request>uri} {request>proto}" {status} {size} "{request>headers>X-Correlation-Id>[0]}" "{request>headers>Referer>[0]}" "{request>headers>User-Agent>[0]}"` {
+			time_format "02/Jan/2006:15:04:05 -0700"
+		}
+	}
+	#
+	handle_errors {
+		respond "{http.error.status_code} {http.error.status_text}"
+	}
+
+#        header Content-Type text/html 
+	root * /www
+        file_server
+	templates * .html
+}

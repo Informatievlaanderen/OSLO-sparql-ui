@@ -1,0 +1,10 @@
+FROM caddy:builder-alpine AS builder
+
+RUN xcaddy build \
+    --with github.com/lolPants/caddy-requestid@v1.1.1 \
+    --with github.com/caddyserver/transform-encoder 
+#    --with github.com/greenpau/caddy-git
+
+FROM caddy:alpine
+
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy

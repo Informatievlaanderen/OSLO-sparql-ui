@@ -1,0 +1,15 @@
+
+{
+        debug
+	auto_https off
+#localhost
+}
+
+:80 {
+
+        # header Content-Type text/html
+
+	root * /www
+        file_server
+	templates *.html
+}
