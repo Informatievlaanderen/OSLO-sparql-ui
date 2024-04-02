@@ -1,6 +1,11 @@
 version 3.0.0
+- nieuwe Caddy basis zoals landingspages uit private repo
 
-- nieuwe Caddy basis zoals landingspages
+version 3.0.1
+
+- nieuwe Caddy basis zoals landingspages publieke repo
 - aanpassing aan de nieuwe Caddy Config style
 - test of environment variable wordt door de templates afgehandeld
 
+version 3.0.2
+- gebruik expliciet relative paths /sparql
