@@ -9,6 +9,7 @@ Contains data.vlaanderen.be styling.
 ## Caddy templates notes
 
 The templates directive must be set specifically on the files it should apply, otherwise it does not work.
+Meer info over templates zie https://caddyserver.com/docs/modules/http.handlers.templates#docs
 
 
 ## Options
